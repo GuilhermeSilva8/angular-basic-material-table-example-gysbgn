@@ -17,30 +17,19 @@ export class Entidades {
   }
 }
 
-const checaEntidades = {
-  'VIEW_ORDEMSERVICO': () => ELEMENT_DATA[0].view = true,
-  'VIEW_CREDENCIADA': () => ELEMENT_DATA[3].view = true,
-  'VIEW_DISPONIBILIDADE': () => ELEMENT_DATA[4].view = true,
-  'default': () => console.log()
-};
-
-// Variável local
-let nomeEntidades = [
-  'OS',
-  'Ambiente',
-  'Ativo',
-  'Credenciada',
-  'Disponibilidade',
+let entidadesPossiveis = [
+  'ORDEMSERVICO',
+  'AMBIENTE',
+  'ATIVO',
+  'CREDENCIADA',
+  'DISPONIBILIDADE',
 ];
 
 // Cria a tabela sem campos preenchidos
 const ELEMENT_DATA: Entidades[] = [];
-nomeEntidades.forEach((elem) => {
+entidadesPossiveis.forEach((elem) => {
   ELEMENT_DATA.push(new Entidades(elem));
 });
-
-//let elem = 'VIEW_ORDEMSERVICO'
-//checaEntidades[elem]();
 
 // permissões que serão recebidas do quarkus
 let permissions = [
@@ -50,25 +39,19 @@ let permissions = [
   'COGNITO_SUPERUSER',
 ];
 
+console.log(permissions);
+
 // preenche os campos
 permissions.forEach((elem) => {
-  /*switch (elem) {
-    case 'VIEW_ORDEMSERVICO':
-      ELEMENT_DATA[0].view = true;
-      break;
+  let campoEntidade = elem.split("_")
+  let campo = campoEntidade[0]
+  let entidade = campoEntidade[1]
+  let indexEntidade = entidadesPossiveis.indexOf(entidade)
 
-    case 'VIEW_CREDENCIADA':
-      ELEMENT_DATA[3].view = true;
-      break;
-
-    case 'VIEW_DISPONIBILIDADE':
-      ELEMENT_DATA[4].view = true;
-      break;
-  }*/
+  if(indexEntidade != -1) {
+    ELEMENT_DATA[indexEntidade][campo.toLocaleLowerCase()] = true
+  }
 });
-
-//console.log(permissions)
-//console.log(ELEMENT_DATA)
 
 /**
  * @title Basic use of `<table mat-table>`
@@ -82,9 +65,17 @@ export class AppComponent {
   displayedColumns: string[] = ['name', 'view', 'create', 'edit', 'delete'];
   dataSource = ELEMENT_DATA;
 
-  toggle(field: string) {
-    //console.log(field)
-    //console.log(ELEMENT_DATA)
+  toggle(field: string, element: Entidades) {
+    let newPermission = field.toUpperCase() + '_' + element.name
+    let index = permissions.indexOf(newPermission)
+
+    if(index != -1) {
+      permissions.splice(index, 1)
+    } else {
+      permissions.push(newPermission)
+    }
+
+    console.log(permissions)
   }
 
 }
